@@ -1,0 +1,138 @@
+/* Styling untuk aplikasi kasir yang mobile responsive */
+
+body {
+    padding-top: 56px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+main {
+    flex: 1;
+}
+
+/* Mobile responsive settings */
+@media (max-width: 768px) {
+    .display-6 {
+        font-size: 1.5rem;
+    }
+
+    .lead {
+        font-size: 1rem;
+    }
+
+    .card-body {
+        padding: 0.75rem;
+    }
+
+    .card i {
+        font-size: 2em !important;
+    }
+
+    .table-responsive {
+        font-size: 0.85rem;
+    }
+}
+
+/* Hamburger menu styling */
+.navbar-toggler {
+    border: 2px solid rgba(255, 255, 255, 0.8) !important;
+    padding: 0.5rem;
+    outline: none !important;
+    box-shadow: none !important;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.8%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e") !important;
+}
+
+.navbar-toggler:hover, .navbar-toggler:focus {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Styling untuk sidebar */
+.offcanvas {
+    max-width: 280px;
+}
+
+.offcanvas-header {
+    padding: 1rem;
+    background-color: #198754;
+    color: white;
+}
+
+.offcanvas-body {
+    padding: 1rem 0.5rem;
+}
+
+.btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Cashier styles */
+.product-item {
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-bottom: 10px;
+}
+
+.product-item:hover {
+    transform: translateY(-3px);
+}
+
+.cart-list {
+    max-height: 50vh;
+    overflow-y: auto;
+}
+
+/* Form controls for smaller screens */
+@media (max-width: 576px) {
+    .form-control, .form-select {
+        font-size: 0.9rem;
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .btn {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.9rem;
+    }
+}
+
+/* Table scroll for smaller screens */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for footer positioning */
+footer {
+    margin-top: auto;
+}
+
+/* Styling for cart items */
+.cart-item {
+    padding: 8px;
+    border-bottom: 1px solid #eee;
+}
+
+/* Styling for payment modal */
+.payment-info {
+    background-color: #f8f9fa;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+/* Styling for product stock levels */
+.stock-low {
+    color: #dc3545;
+    font-weight: bold;
+}
+
+.stock-medium {
+    color: #fd7e14;
+}
+
+.stock-high {
+    color: #198754;
+}

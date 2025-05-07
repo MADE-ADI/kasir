@@ -1,0 +1,169 @@
+[
+    {
+        "id": 1,
+        "items": [
+            {
+                "id": 1,
+                "name": "RISOL",
+                "price": 2000,
+                "quantity": 5,
+                "subtotal": 10000
+            }
+        ],
+        "total": 10000,
+        "payment": 20000,
+        "change": 10000,
+        "date": "2025-05-07 13:03:19"
+    },
+    {
+        "id": 2,
+        "items": [
+            {
+                "id": 1,
+                "name": "RISOL",
+                "price": 2000,
+                "quantity": 10,
+                "subtotal": 20000
+            }
+        ],
+        "total": 20000,
+        "payment": 20000,
+        "change": 0,
+        "date": "2025-05-07 14:00:59"
+    },
+    {
+        "id": 3,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            },
+            {
+                "id": 1,
+                "name": "RISOL",
+                "price": 2000,
+                "quantity": 1,
+                "subtotal": 2000
+            }
+        ],
+        "total": 9000,
+        "payment": 100000,
+        "change": 91000,
+        "date": "2025-05-07 14:04:21"
+    },
+    {
+        "id": 4,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            }
+        ],
+        "total": 7000,
+        "payment": 10000,
+        "change": 3000,
+        "date": "2025-05-07 14:19:27"
+    },
+    {
+        "id": 5,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            }
+        ],
+        "total": 7000,
+        "payment": 40000,
+        "change": 33000,
+        "date": "2025-05-07 14:23:37"
+    },
+    {
+        "id": 6,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            }
+        ],
+        "total": 7000,
+        "payment": 10000,
+        "change": 3000,
+        "date": "2025-05-07 14:27:09"
+    },
+    {
+        "id": 7,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            }
+        ],
+        "total": 7000,
+        "payment": 7000,
+        "change": 0,
+        "date": "2025-05-07 14:45:37"
+    },
+    {
+        "id": 8,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            }
+        ],
+        "total": 7000,
+        "payment": 7000,
+        "change": 0,
+        "date": "2025-05-07 14:47:51"
+    },
+    {
+        "id": 9,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            }
+        ],
+        "total": 7000,
+        "payment": 32322332,
+        "change": 32315332,
+        "date": "2025-05-07 14:57:59"
+    },
+    {
+        "id": 10,
+        "items": [
+            {
+                "id": 2,
+                "name": "BAKSO",
+                "price": 7000,
+                "quantity": 1,
+                "subtotal": 7000
+            }
+        ],
+        "total": 7000,
+        "payment": 10000,
+        "change": 3000,
+        "date": "2025-05-07 22:46:42"
+    }
+]

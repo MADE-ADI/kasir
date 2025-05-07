@@ -1,0 +1,19 @@
+[
+    {
+        "id": 1,
+        "name": "RISOL",
+        "price": 2000.0,
+        "stock": 84,
+        "created_at": "2025-05-07 13:02:41",
+        "category": "makanan",
+        "updated_at": "2025-05-07 13:50:32"
+    },
+    {
+        "id": 2,
+        "name": "BAKSO",
+        "category": "makanan",
+        "price": 7000.0,
+        "stock": 12,
+        "created_at": "2025-05-07 14:03:36"
+    }
+]

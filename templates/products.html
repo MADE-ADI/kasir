@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Produk - Kasir Smakta Resto</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-dark bg-success fixed-top">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Kasir Smakta Resto</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="offcanvas offcanvas-start bg-light" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('index') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('cashier') }}">
+                        <i class="fas fa-cash-register"></i> Kasir
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('products') }}">
+                        <i class="fas fa-box"></i> Produk
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('sales') }}">
+                        <i class="fas fa-receipt"></i> Riwayat Penjualan
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('daily_report') }}">
+                        <i class="fas fa-chart-bar"></i> Laporan Hari Ini
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container-fluid pt-5 mt-5">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2>Kelola Produk</h2>
+                    <a href="{{ url_for('add_product') }}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Tambah Produk
+                    </a>
+                </div>
+
+                <!-- Search and Filter -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="searchProduct" placeholder="Cari produk...">
+                            <button class="btn btn-outline-secondary" type="button" id="btnSearch">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Product Table -->
+                <div class="card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover">
+                                <thead class="table-success">
+                                    <tr>
+                                        <th>No</th>
+                                        <th>Nama Produk</th>
+                                        <th>Harga</th>
+                                        <th>Stok</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="productTableBody">
+                                    {% if products %}
+                                        {% for product in products %}
+                                            <tr>
+                                                <td>{{ loop.index }}</td>
+                                                <td>{{ product.name }}</td>
+                                                <td>Rp {{ "{:,.0f}".format(product.price) }}</td>
+                                                <td>
+                                                    {% if product.stock < 5 %}
+                                                        <span class="stock-low">{{ product.stock }}</span>
+                                                    {% elif product.stock < 20 %}
+                                                        <span class="stock-medium">{{ product.stock }}</span>
+                                                    {% else %}
+                                                        <span class="stock-high">{{ product.stock }}</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-sm btn-primary">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-sm btn-danger" onclick="confirmDelete({{ product.id }})">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    {% else %}
+                                        <tr>
+                                            <td colspan="5" class="text-center">Belum ada produk yang ditambahkan</td>
+                                        </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Konfirmasi Hapus</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Apakah Anda yakin ingin menghapus produk ini?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <a href="#" id="btnConfirmDelete" class="btn btn-danger">Hapus</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-success text-white text-center py-2 mt-5">
+        <p class="mb-0">&copy; 2025 Kasir Smakta Resto</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function confirmDelete(productId) {
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
+            document.getElementById('btnConfirmDelete').href = `/products/delete/${productId}`;
+            deleteModal.show();
+        }
+
+        // Search functionality
+        document.getElementById('btnSearch').addEventListener('click', searchProducts);
+        document.getElementById('searchProduct').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchProducts();
+            }
+        });
+
+        function searchProducts() {
+            const searchTerm = document.getElementById('searchProduct').value.toLowerCase();
+            const rows = document.getElementById('productTableBody').getElementsByTagName('tr');
+            
+            for (let i = 0; i < rows.length; i++) {
+                const productName = rows[i].getElementsByTagName('td')[1];
+                
+                if (productName) {
+                    const textValue = productName.textContent || productName.innerText;
+                    if (textValue.toLowerCase().indexOf(searchTerm) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

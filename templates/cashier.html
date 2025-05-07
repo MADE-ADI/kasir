@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir - Smakta Resto</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Header -->
+    <header class="navbar navbar-dark bg-success fixed-top">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Kasir Smakta Resto</span>
+            <button class="navbar-toggler" type="button" data-bs-toggle="offcanvas" data-bs-target="#sidebar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Sidebar -->
+    <div class="offcanvas offcanvas-start bg-light" tabindex="-1" id="sidebar">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title">Menu</h5>
+            <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column">
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('index') }}">
+                        <i class="fas fa-home"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('cashier') }}">
+                        <i class="fas fa-cash-register"></i> Kasir
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('products') }}">
+                        <i class="fas fa-box"></i> Produk
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('sales') }}">
+                        <i class="fas fa-receipt"></i> Riwayat Penjualan
+                    </a>
+                </li>
+                <li class="nav-item mb-2">
+                    <a class="nav-link btn btn-success text-white" href="{{ url_for('daily_report') }}">
+                        <i class="fas fa-chart-bar"></i> Laporan Hari Ini
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="container-fluid pt-5 mt-5">
+        <div class="row">
+            <!-- Products Section -->
+            <div class="col-md-7 mb-4">
+                <div class="card">
+                    <div class="card-header bg-success text-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">Daftar Produk</h4>
+                            <div class="input-group input-group-sm" style="max-width: 200px;">
+                                <input type="text" class="form-control" id="searchProduct" placeholder="Cari produk...">
+                                <button class="btn btn-outline-light" type="button" id="btnSearch">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <!-- Kategori Navigasi -->
+                        <ul class="nav nav-tabs mb-3" id="categoryTabs" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="all-tab" data-bs-toggle="tab" data-bs-target="#all-content" 
+                                    type="button" role="tab" aria-selected="true">Semua</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="makanan-tab" data-bs-toggle="tab" data-bs-target="#makanan-content" 
+                                    type="button" role="tab" aria-selected="false">Makanan</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="minuman-tab" data-bs-toggle="tab" data-bs-target="#minuman-content" 
+                                    type="button" role="tab" aria-selected="false">Minuman</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="snack-tab" data-bs-toggle="tab" data-bs-target="#snack-content" 
+                                    type="button" role="tab" aria-selected="false">Snack</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="lainnya-tab" data-bs-toggle="tab" data-bs-target="#lainnya-content" 
+                                    type="button" role="tab" aria-selected="false">Lainnya</button>
+                            </li>
+                        </ul>
+                        
+                        <!-- Tab Content -->
+                        <div class="tab-content" id="categoryTabContent">
+                            <!-- All Products Tab -->
+                            <div class="tab-pane fade show active" id="all-content" role="tabpanel" aria-labelledby="all-tab">
+                                <div class="row" id="productList">
+                                    {% for product in products %}
+                                        {% if product.stock > 0 %}
+                                            <div class="col-6 col-sm-4 col-md-4 col-lg-3 product-item" 
+                                                 data-id="{{ product.id }}"
+                                                 data-name="{{ product.name }}"
+                                                 data-price="{{ product.price }}"
+                                                 data-stock="{{ product.stock }}"
+                                                 data-category="{{ product.category|default('lainnya') }}"
+                                                 onclick="addToCart(this)">
+                                                <div class="card mb-2">
+                                                    <div class="card-body text-center p-2">
+                                                        <span class="badge bg-secondary mb-1">{{ product.category|default('lainnya')|title }}</span>
+                                                        <h6 class="card-title mb-1">{{ product.name }}</h6>
+                                                        <p class="card-text mb-1">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                                                        <small class="text-muted">Stok: {{ product.stock }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Makanan Tab -->
+                            <div class="tab-pane fade" id="makanan-content" role="tabpanel" aria-labelledby="makanan-tab">
+                                <div class="row">
+                                    {% for product in products %}
+                                        {% if product.stock > 0 and product.category == 'makanan' %}
+                                            <div class="col-6 col-sm-4 col-md-4 col-lg-3 product-item"
+                                                 data-id="{{ product.id }}"
+                                                 data-name="{{ product.name }}"
+                                                 data-price="{{ product.price }}"
+                                                 data-stock="{{ product.stock }}" 
+                                                 data-category="{{ product.category }}"
+                                                 onclick="addToCart(this)">
+                                                <div class="card mb-2">
+                                                    <div class="card-body text-center p-2">
+                                                        <span class="badge bg-success mb-1">Makanan</span>
+                                                        <h6 class="card-title mb-1">{{ product.name }}</h6>
+                                                        <p class="card-text mb-1">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                                                        <small class="text-muted">Stok: {{ product.stock }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Minuman Tab -->
+                            <div class="tab-pane fade" id="minuman-content" role="tabpanel" aria-labelledby="minuman-tab">
+                                <div class="row">
+                                    {% for product in products %}
+                                        {% if product.stock > 0 and product.category == 'minuman' %}
+                                            <div class="col-6 col-sm-4 col-md-4 col-lg-3 product-item"
+                                                 data-id="{{ product.id }}"
+                                                 data-name="{{ product.name }}"
+                                                 data-price="{{ product.price }}"
+                                                 data-stock="{{ product.stock }}"
+                                                 data-category="{{ product.category }}"
+                                                 onclick="addToCart(this)">
+                                                <div class="card mb-2">
+                                                    <div class="card-body text-center p-2">
+                                                        <span class="badge bg-info mb-1">Minuman</span>
+                                                        <h6 class="card-title mb-1">{{ product.name }}</h6>
+                                                        <p class="card-text mb-1">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                                                        <small class="text-muted">Stok: {{ product.stock }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Snack Tab -->
+                            <div class="tab-pane fade" id="snack-content" role="tabpanel" aria-labelledby="snack-tab">
+                                <div class="row">
+                                    {% for product in products %}
+                                        {% if product.stock > 0 and product.category == 'snack' %}
+                                            <div class="col-6 col-sm-4 col-md-4 col-lg-3 product-item"
+                                                 data-id="{{ product.id }}"
+                                                 data-name="{{ product.name }}"
+                                                 data-price="{{ product.price }}"
+                                                 data-stock="{{ product.stock }}"
+                                                 data-category="{{ product.category }}"
+                                                 onclick="addToCart(this)">
+                                                <div class="card mb-2">
+                                                    <div class="card-body text-center p-2">
+                                                        <span class="badge bg-warning text-dark mb-1">Snack</span>
+                                                        <h6 class="card-title mb-1">{{ product.name }}</h6>
+                                                        <p class="card-text mb-1">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                                                        <small class="text-muted">Stok: {{ product.stock }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            
+                            <!-- Lainnya Tab -->
+                            <div class="tab-pane fade" id="lainnya-content" role="tabpanel" aria-labelledby="lainnya-tab">
+                                <div class="row">
+                                    {% for product in products %}
+                                        {% if product.stock > 0 and (product.category == 'lainnya' or not product.category) %}
+                                            <div class="col-6 col-sm-4 col-md-4 col-lg-3 product-item"
+                                                 data-id="{{ product.id }}"
+                                                 data-name="{{ product.name }}"
+                                                 data-price="{{ product.price }}"
+                                                 data-stock="{{ product.stock }}"
+                                                 data-category="{{ product.category|default('lainnya') }}"
+                                                 onclick="addToCart(this)">
+                                                <div class="card mb-2">
+                                                    <div class="card-body text-center p-2">
+                                                        <span class="badge bg-secondary mb-1">Lainnya</span>
+                                                        <h6 class="card-title mb-1">{{ product.name }}</h6>
+                                                        <p class="card-text mb-1">Rp {{ "{:,.0f}".format(product.price) }}</p>
+                                                        <small class="text-muted">Stok: {{ product.stock }}</small>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cart Section -->
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Keranjang Belanja</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="cart-list mb-3">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Produk</th>
+                                        <th>Jumlah</th>
+                                        <th>Harga</th>
+                                        <th>Subtotal</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cartItems">
+                                    <!-- Cart items will be added here -->
+                                    <tr id="emptyCart">
+                                        <td colspan="5" class="text-center">Keranjang kosong</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Totals -->
+                        <div class="card mb-3">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Barang:</span>
+                                    <span id="totalItems">0 item</span>
+                                </div>
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Harga:</span>
+                                    <span id="totalPrice">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Buttons -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-success" onclick="showPaymentModal()" id="btnPayment" disabled>
+                                <i class="fas fa-money-bill-wave me-2"></i> Bayar
+                            </button>
+                            <button class="btn btn-danger" onclick="clearCart()" id="btnClear" disabled>
+                                <i class="fas fa-trash me-2"></i> Bersihkan
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Payment Modal -->
+    <div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-success text-white">
+                    <h5 class="modal-title">Pembayaran</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="payment-info mb-3">
+                        <div class="row mb-2">
+                            <div class="col-6">Total Belanja:</div>
+                            <div class="col-6 text-end" id="modalTotalPrice">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentAmount" class="form-label">Jumlah Pembayaran (Rp)</label>
+                        <input type="number" class="form-control form-control-lg" id="paymentAmount" min="0">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Kembalian (Rp)</label>
+                        <input type="text" class="form-control form-control-lg bg-light" id="changeAmount" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn btn-success" id="btnFinishPayment" disabled>
+                        <i class="fas fa-check me-2"></i> Selesai
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div class="modal fade" id="receiptModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Struk Pembayaran</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-3">
+                        <h4>Smakta Resto</h4>
+                        <p class="small mb-1">Jl. Contoh No. 123</p>
+                        <p class="small">Telp: 087123456789</p>
+                    </div>
+                    <div class="border-top border-bottom py-2 mb-3">
+                        <div class="row small">
+                            <div class="col-6">Tanggal:</div>
+                            <div class="col-6 text-end" id="receiptDate"></div>
+                        </div>
+                    </div>
+                    <div id="receiptItems" class="mb-3">
+                        <!-- Receipt items will be added here -->
+                    </div>
+                    <div class="border-top pt-2">
+                        <div class="row mb-1">
+                            <div class="col-6">Total:</div>
+                            <div class="col-6 text-end" id="receiptTotal">Rp 0</div>
+                        </div>
+                        <div class="row mb-1">
+                            <div class="col-6">Bayar:</div>
+                            <div class="col-6 text-end" id="receiptPayment">Rp 0</div>
+                        </div>
+                        <div class="row">
+                            <div class="col-6">Kembalian:</div>
+                            <div class="col-6 text-end" id="receiptChange">Rp 0</div>
+                        </div>
+                    </div>
+                    <div class="text-center mt-3">
+                        <p class="small mb-0">Terima Kasih Atas Kunjungan Anda</p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                    <button type="button" class="btn btn-primary" id="btnPrintReceipt">
+                        <i class="fas fa-print me-2"></i> Cetak
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-success text-white text-center py-2 mt-5">
+        <p class="mb-0">&copy; 2025 Kasir Smakta Resto</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Global variables
+        let cart = [];
+        let totalAmount = 0;
+        
+        // Add product to cart
+        function addToCart(element) {
+            const productId = parseInt(element.getAttribute('data-id'));
+            const productName = element.getAttribute('data-name');
+            const productPrice = parseFloat(element.getAttribute('data-price'));
+            const productStock = parseInt(element.getAttribute('data-stock'));
+            
+            // Check if product is already in cart
+            const existingItem = cart.find(item => item.id === productId);
+            
+            if (existingItem) {
+                // Check stock before adding
+                if (existingItem.quantity < productStock) {
+                    existingItem.quantity++;
+                    existingItem.subtotal = existingItem.price * existingItem.quantity;
+                } else {
+                    alert('Stok tidak cukup!');
+                    return;
+                }
+            } else {
+                // Add new item to cart
+                const item = {
+                    id: productId,
+                    name: productName,
+                    price: productPrice,
+                    quantity: 1,
+                    stock: productStock,
+                    subtotal: productPrice
+                };
+                cart.push(item);
+            }
+            
+            // Update cart UI
+            updateCartUI();
+        }
+        
+        // Update cart item quantity
+        function updateQuantity(productId, change) {
+            const item = cart.find(item => item.id === productId);
+            if (item) {
+                if (change > 0 && item.quantity < item.stock) {
+                    item.quantity++;
+                } else if (change < 0 && item.quantity > 1) {
+                    item.quantity--;
+                }
+                item.subtotal = item.price * item.quantity;
+                updateCartUI();
+            }
+        }
+        
+        // Remove item from cart
+        function removeItem(productId) {
+            cart = cart.filter(item => item.id !== productId);
+            updateCartUI();
+        }
+        
+        // Clear cart
+        function clearCart() {
+            if (confirm('Apakah Anda yakin ingin mengosongkan keranjang belanja?')) {
+                cart = [];
+                
+                // Perbarui UI keranjang belanja
+                const cartElement = document.getElementById('cartItems');
+                // Hapus semua item dari tampilan
+                while (cartElement.firstChild) {
+                    cartElement.removeChild(cartElement.firstChild);
+                }
+                
+                // Tambahkan pesan keranjang kosong
+                const emptyRow = document.createElement('tr');
+                emptyRow.id = 'emptyCart';
+                const emptyCell = document.createElement('td');
+                emptyCell.colSpan = 5;
+                emptyCell.className = 'text-center';
+                emptyCell.textContent = 'Keranjang kosong';
+                emptyRow.appendChild(emptyCell);
+                cartElement.appendChild(emptyRow);
+                
+                // Reset total dan disable tombol
+                document.getElementById('totalItems').textContent = '0 item';
+                document.getElementById('totalPrice').textContent = 'Rp 0';
+                document.getElementById('btnPayment').disabled = true;
+                document.getElementById('btnClear').disabled = true;
+                totalAmount = 0;
+            }
+        }
+        
+        // Update cart UI
+        function updateCartUI() {
+            const cartElement = document.getElementById('cartItems');
+            const totalItemsElement = document.getElementById('totalItems');
+            const totalPriceElement = document.getElementById('totalPrice');
+            const btnPayment = document.getElementById('btnPayment');
+            const btnClear = document.getElementById('btnClear');
+            
+            // Clear cart items
+            while (cartElement.firstChild) {
+                cartElement.removeChild(cartElement.firstChild);
+            }
+            
+            if (cart.length === 0) {
+                // Create a new empty cart message row
+                const emptyRow = document.createElement('tr');
+                emptyRow.id = 'emptyCart';
+                const emptyCell = document.createElement('td');
+                emptyCell.colSpan = 5;
+                emptyCell.className = 'text-center';
+                emptyCell.textContent = 'Keranjang kosong';
+                emptyRow.appendChild(emptyCell);
+                cartElement.appendChild(emptyRow);
+                
+                totalItemsElement.textContent = '0 item';
+                totalPriceElement.textContent = 'Rp 0';
+                totalAmount = 0;
+                btnPayment.disabled = true;
+                btnClear.disabled = true;
+            } else {
+                // Add cart items
+                let totalItems = 0;
+                totalAmount = 0;
+                
+                cart.forEach(item => {
+                    const row = document.createElement('tr');
+                    
+                    const nameCell = document.createElement('td');
+                    nameCell.textContent = item.name;
+                    
+                    const quantityCell = document.createElement('td');
+                    const quantityDiv = document.createElement('div');
+                    quantityDiv.className = 'd-flex align-items-center';
+                    
+                    const minusBtn = document.createElement('button');
+                    minusBtn.className = 'btn btn-sm btn-outline-secondary';
+                    minusBtn.innerHTML = '<i class="fas fa-minus"></i>';
+                    minusBtn.onclick = () => updateQuantity(item.id, -1);
+                    
+                    const quantitySpan = document.createElement('span');
+                    quantitySpan.className = 'mx-2';
+                    quantitySpan.textContent = item.quantity;
+                    
+                    const plusBtn = document.createElement('button');
+                    plusBtn.className = 'btn btn-sm btn-outline-secondary';
+                    plusBtn.innerHTML = '<i class="fas fa-plus"></i>';
+                    plusBtn.onclick = () => updateQuantity(item.id, 1);
+                    
+                    quantityDiv.appendChild(minusBtn);
+                    quantityDiv.appendChild(quantitySpan);
+                    quantityDiv.appendChild(plusBtn);
+                    quantityCell.appendChild(quantityDiv);
+                    
+                    const priceCell = document.createElement('td');
+                    priceCell.textContent = formatCurrency(item.price);
+                    
+                    const subtotalCell = document.createElement('td');
+                    subtotalCell.textContent = formatCurrency(item.subtotal);
+                    
+                    const actionCell = document.createElement('td');
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.className = 'btn btn-sm btn-danger';
+                    deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+                    deleteBtn.onclick = () => removeItem(item.id);
+                    actionCell.appendChild(deleteBtn);
+                    
+                    row.appendChild(nameCell);
+                    row.appendChild(quantityCell);
+                    row.appendChild(priceCell);
+                    row.appendChild(subtotalCell);
+                    row.appendChild(actionCell);
+                    
+                    cartElement.appendChild(row);
+                    
+                    totalItems += item.quantity;
+                    totalAmount += item.subtotal;
+                });
+                
+                totalItemsElement.textContent = `${totalItems} item`;
+                totalPriceElement.textContent = formatCurrency(totalAmount);
+                btnPayment.disabled = false;
+                btnClear.disabled = false;
+            }
+        }
+        
+        // Show payment modal
+        function showPaymentModal() {
+            const modalTotalPrice = document.getElementById('modalTotalPrice');
+            modalTotalPrice.textContent = formatCurrency(totalAmount);
+            
+            const paymentAmount = document.getElementById('paymentAmount');
+            paymentAmount.value = '';
+            paymentAmount.min = totalAmount;
+            
+            const changeAmount = document.getElementById('changeAmount');
+            changeAmount.value = '';
+            
+            const btnFinishPayment = document.getElementById('btnFinishPayment');
+            btnFinishPayment.disabled = true;
+            
+            const paymentModal = new bootstrap.Modal(document.getElementById('paymentModal'));
+            paymentModal.show();
+            
+            // Calculate change
+            paymentAmount.addEventListener('input', function() {
+                const payment = parseFloat(this.value) || 0;
+                const change = payment - totalAmount;
+                
+                changeAmount.value = change >= 0 ? formatCurrency(change) : '';
+                btnFinishPayment.disabled = change < 0;
+            });
+            
+            // Handle finish payment
+            btnFinishPayment.onclick = processPayment;
+        }
+        
+        // Process payment
+        function processPayment() {
+            const payment = parseFloat(document.getElementById('paymentAmount').value);
+            const change = payment - totalAmount;
+            
+            // Prepare sales data
+            const saleData = {
+                items: cart.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    subtotal: item.subtotal
+                })),
+                total: totalAmount,
+                payment: payment,
+                change: change
+            };
+            
+            // Log data yang dikirim untuk debugging
+            console.log('Mengirim data ke server:', JSON.stringify(saleData));
+            
+            // Send data to server
+            fetch('/sales/process', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(saleData)
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(errorData => {
+                        throw new Error(errorData.error || 'Terjadi kesalahan saat memproses pembayaran.');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Close payment modal
+                    const paymentModal = bootstrap.Modal.getInstance(document.getElementById('paymentModal'));
+                    paymentModal.hide();
+                    
+                    // Show receipt
+                    showReceipt(saleData);
+                    
+                    // Clear cart after successful payment
+                    cart = [];
+                    updateCartUI();
+                } else {
+                    alert(data.error || 'Terjadi kesalahan saat memproses pembayaran.');
+                }
+            })
+            .catch(error => {
+                console.error('Error processing payment:', error);
+                alert(error.message || 'Terjadi kesalahan saat memproses pembayaran.');
+            });
+        }
+        
+        // Show receipt
+        function showReceipt(saleData) {
+            const receiptDate = document.getElementById('receiptDate');
+            const receiptItems = document.getElementById('receiptItems');
+            const receiptTotal = document.getElementById('receiptTotal');
+            const receiptPayment = document.getElementById('receiptPayment');
+            const receiptChange = document.getElementById('receiptChange');
+            
+            // Set date
+            const now = new Date();
+            receiptDate.textContent = now.toLocaleString('id-ID');
+            
+            // Clear receipt items
+            receiptItems.innerHTML = '';
+            
+            // Add receipt items
+            saleData.items.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'row mb-2 small';
+                
+                const itemName = document.createElement('div');
+                itemName.className = 'col-12';
+                itemName.textContent = `${item.name} (${item.quantity} x ${formatCurrency(item.price)})`;
+                
+                const itemSubtotal = document.createElement('div');
+                itemSubtotal.className = 'col-12 text-end';
+                itemSubtotal.textContent = formatCurrency(item.subtotal);
+                
+                itemDiv.appendChild(itemName);
+                itemDiv.appendChild(itemSubtotal);
+                
+                receiptItems.appendChild(itemDiv);
+            });
+            
+            // Set totals
+            receiptTotal.textContent = formatCurrency(saleData.total);
+            receiptPayment.textContent = formatCurrency(saleData.payment);
+            receiptChange.textContent = formatCurrency(saleData.change);
+            
+            // Show receipt modal
+            const receiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
+            receiptModal.show();
+            
+            // Handle print receipt
+            document.getElementById('btnPrintReceipt').onclick = function() {
+                const printContents = document.getElementById('receiptModal').querySelector('.modal-body').innerHTML;
+                const originalContents = document.body.innerHTML;
+                
+                document.body.innerHTML = printContents;
+                window.print();
+                document.body.innerHTML = originalContents;
+                
+                // Reload page after print
+                window.location.reload();
+            };
+            
+            // Auto refresh setelah menutup modal
+            document.getElementById('receiptModal').addEventListener('hidden.bs.modal', function() {
+                // Reload page after closing receipt modal
+                window.location.reload();
+            });
+        }
+        
+        // Format currency
+        function formatCurrency(amount) {
+            return 'Rp ' + amount.toFixed(0).replace(/\d(?=(\d{3})+$)/g, '$&,');
+        }
+        
+        // Search products
+        document.getElementById('btnSearch').addEventListener('click', searchProducts);
+        document.getElementById('searchProduct').addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                searchProducts();
+            }
+        });
+        
+        function searchProducts() {
+            const searchTerm = document.getElementById('searchProduct').value.toLowerCase();
+            const products = document.querySelectorAll('.product-item');
+            
+            for (let product of products) {
+                const productName = product.getAttribute('data-name').toLowerCase();
+                if (productName.includes(searchTerm)) {
+                    product.style.display = '';
+                } else {
+                    product.style.display = 'none';
+                }
+            }
+        }
+    </script>
+</body>
+</html>
